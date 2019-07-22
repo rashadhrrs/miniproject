@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,19 +29,31 @@ public class ProductController {
 	@Autowired 
 	ProductDao productDao;
 	
-	@GetMapping("getAll")
-	public List <Product> getAll() {
+	
+	  @GetMapping("getAll") 
+	  public List <Product> getAll() {
+	  
+	  
+	  List<Product>result = new ArrayList<>();
+	  
+	  productDao.findAll().forEach(result::add);
+	  
+	  return result; }
+	 
+	
+	@GetMapping("getAllBrand")
+	public List <Brand> getAllBrand() {
 		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<List<Brand>> response = restTemplate.exchange(
+		  "http://localhost:8081/brand/getAll",
+		  HttpMethod.GET,
+		  null,
+		  new ParameterizedTypeReference<List<Brand>>(){});
+		List<Brand> brand = response.getBody();
 		
-		List<Product>result = new ArrayList<>();
-		
-		productDao.findAll().forEach(result::add);
-		
-		return result.stream().(result{
-			Brand brand = restTemplate.getForObject("http://localhost:8081/brand/" + brand.getName(), Brand.class);
-			return new Product(brand.getName(),"desc", product.getProduct());
-		})
-	}
+		return brand;
+		}
+	
 	
 	@PostMapping(value = "save")
 	public Product save(@RequestBody Product product) { 
