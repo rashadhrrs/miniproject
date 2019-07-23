@@ -1,5 +1,6 @@
 package com.eksad.miniproject.netflixproduct.controller;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,13 +26,23 @@ import com.eksad.miniproject.netflixproduct.model.Brand;
 import com.eksad.miniproject.netflixproduct.model.Product;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @Service
 @RestController
 @RequestMapping(value = "/product")
+@Api(tags = "Product")
 public class ProductController {
 
 	@Autowired
 	ProductDao productDao;
+	
+	@ApiOperation(
+			value= "API to get all Product",
+			notes= "Return data with JSON Format ",
+			tags= "Get Data API"
+			)
 
 	@GetMapping("getAll")
 	public List<Product> getAll() {
@@ -43,7 +54,8 @@ public class ProductController {
 		return result;
 	}
 
-	@GetMapping("getAllBrand")
+	//@GetMapping("getAllBrand")
+	
 	/*
 	 * public List<Brand> getAllBrand() { RestTemplate restTemplate = new
 	 * RestTemplate(); ResponseEntity<List<Brand>> response =
@@ -53,31 +65,46 @@ public class ProductController {
 	 * 
 	 * return brand; }
 	 */
-
-	
-	  @HystrixCommand(fallbackMethod = "fallbackList" ) 
-	  public List <Brand> getAllBrand() { 
-	  RestTemplate restTemplate = new RestTemplate();
-	  ResponseEntity<List<Brand>> response = restTemplate.exchange(
-	  "http://localhost:8081/brand/getAll", HttpMethod.GET, null, new
-	  ParameterizedTypeReference<List<Brand>>(){}); List<Brand> brand =
-	  response.getBody();
-	  
-	  return getAllBrand(); 
-	  
-	}
 	 
-
 	
-	  @SuppressWarnings("unused") 
-	  public String fallbackList() {
+	
+	@GetMapping("getAllBrand")
+	  @HystrixCommand(fallbackMethod = "fallbackList" )
+	
+	 public String readingList() { 
+		
+	  RestTemplate restTemplate = new RestTemplate();
+		
+		  ResponseEntity<List<Brand>> response = restTemplate.exchange(
+		  "http://localhost:8081/brand/getAll", HttpMethod.GET, null, new
+		  ParameterizedTypeReference<List<Brand>>(){}); List<Brand> brand =
+		  response.getBody();
+		 
+		
+		
 	  
-	  System.out.println("Service is down!!! fallback route enabled...");
+	  return response.toString();
+	  
+	  }
+	  
+	  
+	  
+	  //@SuppressWarnings("unused")
+	
+	public String fallbackList() {
+	  
+	  //System.out.println("Service is down!!! fallback route enabled...");
 	  
 	  return "Circuit breaker enabled"; }
 	 
+	 
 	
 
+	  @ApiOperation(
+				value= "API to save Product",
+				notes= "Return data with JSON Format ",
+				tags= "Data Manipulation API"
+				)	
 	@PostMapping(value = "save")
 	public Product save(@RequestBody Product product) {
 		try {
@@ -89,6 +116,12 @@ public class ProductController {
 			return null;
 		}
 	}
+	  
+	  @ApiOperation(
+				value= "API to update Product",
+				notes= "Return data with JSON Format ",
+				tags= "Data Manipulation API"
+				)
 
 	@PutMapping(value = "update/{id}")
 	public Product update(@RequestBody Product product, @PathVariable Long id) {
@@ -105,6 +138,12 @@ public class ProductController {
 		}
 
 	}
+	  
+	  @ApiOperation(
+				value= "API to delete Product",
+				notes= "Return data with JSON Format ",
+				tags= "Data Manipulation API"
+				)
 
 	@DeleteMapping(value = "delete/{id}")
 	public HashMap<String, Object> delete(@PathVariable Long id) {

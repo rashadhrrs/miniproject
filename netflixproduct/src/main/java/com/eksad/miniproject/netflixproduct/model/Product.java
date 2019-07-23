@@ -20,11 +20,6 @@ import lombok.ToString;
 @Table(name = "Products")
 public class Product extends BaseEntity{
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	
 	@Column(nullable = false)
 	private String name;
 	
