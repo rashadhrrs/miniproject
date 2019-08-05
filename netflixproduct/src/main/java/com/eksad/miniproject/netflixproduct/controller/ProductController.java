@@ -54,48 +54,36 @@ public class ProductController {
 		return result;
 	}
 
-	//@GetMapping("getAllBrand")
 	
-	/*
-	 * public List<Brand> getAllBrand() { RestTemplate restTemplate = new
-	 * RestTemplate(); ResponseEntity<List<Brand>> response =
-	 * restTemplate.exchange("http://localhost:8081/brand/getAll", HttpMethod.GET,
-	 * null, new ParameterizedTypeReference<List<Brand>>() { }); List<Brand> brand =
-	 * response.getBody();
-	 * 
-	 * return brand; }
-	 */
+	@ApiOperation(
+			value= "API to get all Brand",
+			notes= "Return data with JSON Format ",
+			tags= "Get Data API"
+			)
+	@GetMapping("getAllBrand")
+	@HystrixCommand(fallbackMethod = "fallbackList" )
+	
+	  public List<Brand> getAllBrand() { 
+		
+	  RestTemplate restTemplate = new RestTemplate(); 
+	  ResponseEntity<List<Brand>> response =  restTemplate
+			  .exchange("http://localhost:8081/brand/getAll", HttpMethod.GET,
+			  null, new ParameterizedTypeReference<List<Brand>>() { }); 
+	  List<Brand> brand = response.getBody();
+	  
+	  return brand; }
+	
+	
+	  public List<Brand> fallbackList() {
+	  
+	  System.out.println("Service is down!!! fallback route enabled...");
+	  
+	  return new ArrayList<Brand>();}
 	 
 	
+	 
+	 
 	
-	@GetMapping("getAllBrand")
-	  @HystrixCommand(fallbackMethod = "fallbackList" )
-	
-	 public String readingList() { 
-		
-	  RestTemplate restTemplate = new RestTemplate();
-		
-		  ResponseEntity<List<Brand>> response = restTemplate.exchange(
-		  "http://localhost:8081/brand/getAll", HttpMethod.GET, null, new
-		  ParameterizedTypeReference<List<Brand>>(){}); List<Brand> brand =
-		  response.getBody();
-		 
-		
-		
-	  
-	  return response.toString();
-	  
-	  }
-	  
-	  
-	  
-	  //@SuppressWarnings("unused")
-	
-	public String fallbackList() {
-	  
-	  //System.out.println("Service is down!!! fallback route enabled...");
-	  
-	  return "Circuit breaker enabled"; }
 	 
 	 
 	
@@ -112,7 +100,7 @@ public class ProductController {
 			return productDao.save(product);
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			
 			return null;
 		}
 	}
